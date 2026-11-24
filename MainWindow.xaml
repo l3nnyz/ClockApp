@@ -1,0 +1,246 @@
+﻿<Window x:Class="ClockApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:m="clr-namespace:ClockApp"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=m:MainViewModel}"
+        Title="Horloge mondiale"
+        Width="1120" Height="800" MinWidth="720" MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="{StaticResource TextFont}">
+
+    <Window.Resources>
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+        </Style>
+
+        <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="32,20,32,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="&#xE917;" FontFamily="{StaticResource IconFont}" FontSize="22"
+                           Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
+                           VerticalAlignment="Center" Margin="0,2,12,0" />
+                <TextBlock Text="Horloge mondiale" FontFamily="{StaticResource DisplayFont}"
+                           FontSize="28" FontWeight="SemiBold" VerticalAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Click="Sync_Click" Padding="12,6" ToolTip="{Binding StatusText}"
+                        IsEnabled="{Binding CanSync}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE72C;" FontFamily="{StaticResource IconFont}" FontSize="13"
+                                   VerticalAlignment="Center" Margin="0,1,8,0" />
+                        <TextBlock Text="Synchroniser l'heure" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Padding="32,28"
+                DataContext="{Binding}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Viewbox Width="230" Height="230" Margin="0,0,40,0">
+                    <Canvas Width="200" Height="200">
+                        <Ellipse Width="200" Height="200" Fill="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                 Stroke="{DynamicResource CardStrokeColorDefaultBrush}" StrokeThickness="1" />
+                        <Canvas x:Name="DialTicks" />
+
+                        <Line X1="100" Y1="112" X2="100" Y2="52" StrokeThickness="7"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                              Stroke="{DynamicResource TextFillColorPrimaryBrush}">
+                            <Line.RenderTransform>
+                                <RotateTransform CenterX="100" CenterY="100" Angle="{Binding HourAngle}" />
+                            </Line.RenderTransform>
+                        </Line>
+                        <Line X1="100" Y1="114" X2="100" Y2="26" StrokeThickness="4.5"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                              Stroke="{DynamicResource TextFillColorPrimaryBrush}">
+                            <Line.RenderTransform>
+                                <RotateTransform CenterX="100" CenterY="100" Angle="{Binding MinuteAngle}" />
+                            </Line.RenderTransform>
+                        </Line>
+                        <Line X1="100" Y1="122" X2="100" Y2="18" StrokeThickness="2"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                              Stroke="{DynamicResource AccentFillColorDefaultBrush}">
+                            <Line.RenderTransform>
+                                <RotateTransform CenterX="100" CenterY="100" Angle="{Binding SecondAngle}" />
+                            </Line.RenderTransform>
+                        </Line>
+                        <Ellipse Canvas.Left="94" Canvas.Top="94" Width="12" Height="12"
+                                 Fill="{DynamicResource AccentFillColorDefaultBrush}" />
+                        <Ellipse Canvas.Left="97.5" Canvas.Top="97.5" Width="5" Height="5"
+                                 Fill="{DynamicResource CardBackgroundFillColorDefaultBrush}" />
+                    </Canvas>
+                </Viewbox>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" DataContext="{Binding Selected}">
+                    <TextBlock FontSize="15" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                        <Run Text="{Binding Country, Mode=OneWay}" />
+                        <Run Text="·" />
+                        <Run Text="{Binding UtcText, Mode=OneWay}" />
+                    </TextBlock>
+                    <TextBlock Text="{Binding City}" FontFamily="{StaticResource DisplayFont}"
+                               FontSize="34" FontWeight="SemiBold" Margin="0,2,0,0" />
+
+                    <StackPanel Orientation="Horizontal" Margin="-4,0,0,0">
+                        <TextBlock Text="{Binding TimeText}" FontFamily="{StaticResource DisplayFont}"
+                                   FontSize="104" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding SecondsText}" FontFamily="{StaticResource DisplayFont}"
+                                   FontSize="40" FontWeight="SemiBold" Margin="10,0,0,22" VerticalAlignment="Bottom"
+                                   Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding DateText}" FontSize="18" Margin="0,-6,0,10" />
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="8" Height="8" VerticalAlignment="Center" Margin="0,1,8,0">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Fill" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSynced}" Value="True">
+                                            <Setter Property="Fill" Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+                        <TextBlock Text="{Binding SourceText}" FontSize="13"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        <TextBlock Text="  ·  " FontSize="13" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        <TextBlock Text="{Binding RelativeText}" FontSize="13"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" Margin="0,28,0,12">
+            <TextBlock Text="Vos villes" FontFamily="{StaticResource DisplayFont}" FontSize="20"
+                       FontWeight="SemiBold" VerticalAlignment="Center" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Grid Width="260" VerticalAlignment="Center">
+                    <ComboBox x:Name="CityPicker" ItemsSource="{Binding Catalog}" SelectedItem="{Binding CityToAdd}"
+                              DisplayMemberPath="Display" />
+                    <TextBlock Text="Choisir une ville…" Margin="12,0,0,1" VerticalAlignment="Center"
+                               IsHitTestVisible="False" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedItem, ElementName=CityPicker}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+                <Button Click="AddCity_Click" Margin="8,0,0,0" Padding="14,6" VerticalAlignment="Center"
+                        Background="{DynamicResource AccentFillColorDefaultBrush}"
+                        Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE710;" FontFamily="{StaticResource IconFont}" FontSize="12"
+                                   VerticalAlignment="Center" Margin="0,1,8,0" />
+                        <TextBlock Text="Ajouter" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0">
+            <ItemsControl ItemsSource="{Binding Cities}" Margin="0,0,0,24">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type m:CityClock}">
+                        <Border x:Name="Card" Width="250" Margin="0,0,12,12" Padding="20,16,12,18"
+                                Cursor="Hand" MouseLeftButtonUp="CityCard_Click">
+                            <Border.Style>
+                                <Style TargetType="Border" BasedOn="{StaticResource CardStyle}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorSecondaryBrush}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock x:Name="DayIcon" Text="&#xE706;" FontFamily="{StaticResource IconFont}"
+                                                   FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0"
+                                                   Foreground="#FFB900" />
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding City}" FontSize="16" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding Country}" FontSize="12"
+                                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Button Style="{StaticResource IconButton}" HorizontalAlignment="Right"
+                                            VerticalAlignment="Top" FontSize="10" Padding="7" Margin="0,-6,0,0"
+                                            Content="&#xE711;" ToolTip="Retirer" Click="RemoveCity_Click" />
+                                </Grid>
+
+                                <TextBlock Grid.Row="1" Text="{Binding TimeText}" FontFamily="{StaticResource DisplayFont}"
+                                           FontSize="46" FontWeight="SemiBold" Margin="-2,8,0,0" />
+
+                                <StackPanel Grid.Row="2">
+                                    <TextBlock Text="{Binding RelativeText}" FontSize="13" />
+                                    <TextBlock Text="{Binding DateText}" FontSize="12" Margin="0,2,0,0"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsDay}" Value="False">
+                                <Setter TargetName="DayIcon" Property="Text" Value="&#xE708;" />
+                                <Setter TargetName="DayIcon" Property="Foreground" Value="#8AB4F8" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                <Setter TargetName="Card" Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                <Setter TargetName="Card" Property="BorderThickness" Value="2" />
+                                <Setter TargetName="Card" Property="Padding" Value="19,15,11,17" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</Window>

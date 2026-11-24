@@ -1,0 +1,12 @@
+﻿<Application x:Class="ClockApp.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:ClockApp"
+             ThemeMode="System"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+        <FontFamily x:Key="DisplayFont">Segoe UI Variable Display, Segoe UI</FontFamily>
+        <FontFamily x:Key="TextFont">Segoe UI Variable Text, Segoe UI</FontFamily>
+    </Application.Resources>
+</Application>
