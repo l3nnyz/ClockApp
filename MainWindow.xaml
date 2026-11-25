@@ -540,6 +540,42 @@
                             </Grid>
                         </Border>
                     </StackPanel>
+
+                    <TextBlock Text="Application" Style="{StaticResource SectionTitle}" Margin="0,28,0,10" />
+
+                    <Border Style="{StaticResource SettingCard}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="&#xE7E8;" Style="{StaticResource SettingIcon}" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Lancer au démarrage de Windows" FontSize="14" />
+                                <TextBlock Style="{StaticResource SettingDescription}"
+                                           Text="L'horloge démarre discrètement dans la zone de notification, prête pour vos rappels." />
+                            </StackPanel>
+                            <CheckBox Grid.Column="2" Style="{StaticResource Switch}" IsChecked="{Binding StartWithWindows}" />
+                        </Grid>
+                    </Border>
+
+                    <Border Style="{StaticResource SettingCard}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="&#xE8A7;" Style="{StaticResource SettingIcon}" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Garder dans la zone de notification" FontSize="14" />
+                                <TextBlock Style="{StaticResource SettingDescription}"
+                                           Text="Fermer la fenêtre la range près de l'heure de Windows au lieu de quitter. Clic droit sur l'icône pour quitter." />
+                            </StackPanel>
+                            <CheckBox Grid.Column="2" Style="{StaticResource Switch}" IsChecked="{Binding CloseToTray}" />
+                        </Grid>
+                    </Border>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>

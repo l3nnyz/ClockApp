@@ -34,6 +34,12 @@ namespace ClockApp
         private bool _playSound = true;
         public bool PlaySound { get => _playSound; set => SetField(ref _playSound, value); }
 
+        private bool _startWithWindows;
+        public bool StartWithWindows { get => _startWithWindows; set => SetField(ref _startWithWindows, value); }
+
+        private bool _closeToTray = true;
+        public bool CloseToTray { get => _closeToTray; set => SetField(ref _closeToTray, value); }
+
         public bool IsEnabled(ReminderKind kind) => kind switch
         {
             ReminderKind.Morning => MorningReminder,

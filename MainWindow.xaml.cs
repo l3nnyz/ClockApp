@@ -1,10 +1,12 @@
-﻿using System.Media;
+using System.ComponentModel;
+using System.Media;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using ClockApp.Reminders;
 
 namespace ClockApp
 {
@@ -12,7 +14,13 @@ namespace ClockApp
     {
         private readonly MainViewModel _vm = new();
         private readonly DispatcherTimer _syncTimer = new() { Interval = TimeSpan.FromMinutes(15) };
-        private readonly DispatcherTimer _reminderTimer = new() { Interval = TimeSpan.FromSeconds(5) };
+        private bool _allowClose;
+
+        public MainViewModel ViewModel => _vm;
+
+        public event Action? HiddenToTray;
+
+        public event Action? ExitRequested;
 
         public MainWindow()
         {
@@ -20,22 +28,66 @@ namespace ClockApp
             DataContext = _vm;
             DrawDialTicks();
 
-            CompositionTarget.Rendering += (_, _) => _vm.Tick();
-
-            _reminderTimer.Tick += (_, _) => _vm.CheckReminders();
-            _vm.Reminders.Raised += reminder =>
-            {
-                ReminderToast.Show(reminder);
-                if (_vm.Settings.PlaySound) SystemSounds.Asterisk.Play();
-            };
+            IsVisibleChanged += OnIsVisibleChanged;
 
             _syncTimer.Tick += async (_, _) => await _vm.SyncAsync();
-            Loaded += async (_, _) =>
+            _syncTimer.Start();
+            Dispatcher.InvokeAsync(_vm.SyncAsync);
+        }
+
+        public void Open()
+        {
+            Show();
+            if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+            Activate();
+        }
+
+        public void StartBackgroundWork()
+        {
+            var reminderTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+            reminderTimer.Tick += (_, _) => _vm.CheckReminders();
+            reminderTimer.Start();
+            _vm.Reminders.Raised += OnReminderRaised;
+        }
+
+        public void AllowClose() => _allowClose = true;
+
+        private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (IsVisible)
             {
-                _reminderTimer.Start();
-                _syncTimer.Start();
-                await _vm.SyncAsync();
-            };
+                CompositionTarget.Rendering += OnRendering;
+                StartBackgroundWork();
+            }
+            else
+            {
+                CompositionTarget.Rendering -= OnRendering;
+            }
+        }
+
+        private void OnRendering(object? sender, EventArgs e) => _vm.Tick();
+
+        private void OnReminderRaised(Reminder reminder)
+        {
+            ReminderToast.Show(reminder);
+            if (_vm.Settings.PlaySound) SystemSounds.Asterisk.Play();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            if (!_allowClose && _vm.Settings.CloseToTray)
+            {
+                e.Cancel = true;
+                Hide();
+                HiddenToTray?.Invoke();
+            }
+            base.OnClosing(e);
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            if (!_allowClose) ExitRequested?.Invoke();
         }
 
         private void DrawDialTicks()
