@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Media;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -11,6 +12,7 @@ namespace ClockApp
     {
         private readonly MainViewModel _vm = new();
         private readonly DispatcherTimer _syncTimer = new() { Interval = TimeSpan.FromMinutes(15) };
+        private readonly DispatcherTimer _reminderTimer = new() { Interval = TimeSpan.FromSeconds(5) };
 
         public MainWindow()
         {
@@ -20,9 +22,17 @@ namespace ClockApp
 
             CompositionTarget.Rendering += (_, _) => _vm.Tick();
 
+            _reminderTimer.Tick += (_, _) => _vm.CheckReminders();
+            _vm.Reminders.Raised += reminder =>
+            {
+                ReminderToast.Show(reminder);
+                if (_vm.Settings.PlaySound) SystemSounds.Asterisk.Play();
+            };
+
             _syncTimer.Tick += async (_, _) => await _vm.SyncAsync();
             Loaded += async (_, _) =>
             {
+                _reminderTimer.Start();
                 _syncTimer.Start();
                 await _vm.SyncAsync();
             };
@@ -62,6 +72,8 @@ namespace ClockApp
         }
 
         private async void AddCity_Click(object sender, RoutedEventArgs e) => await _vm.AddCityAsync();
+
+        private void TestReminder_Click(object sender, RoutedEventArgs e) => _vm.TestReminder();
 
         private async void Sync_Click(object sender, RoutedEventArgs e) => await _vm.SyncAsync();
     }

@@ -26,17 +26,152 @@
             <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
             <Setter Property="FontSize" Value="14" />
         </Style>
+
+        <!-- Onglets façon « pivot » Windows 11 : texte + soulignement accentué -->
+        <Style x:Key="PivotTabControl" TargetType="TabControl">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TabPanel IsItemsHost="True" Margin="0,0,0,18" />
+                            <ContentPresenter Grid.Row="1" ContentSource="SelectedContent" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Header = texte, Tag = glyphe de l'icône. Le contenu de l'onglet hérite de Foreground. -->
+        <Style x:Key="PivotTab" TargetType="TabItem">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource AncestorType=TabItem}}"
+                                       FontFamily="{StaticResource IconFont}" FontSize="14" FontWeight="Normal"
+                                       VerticalAlignment="Center" Margin="0,1,8,0" />
+                            <TextBlock Text="{Binding}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Background="Transparent" Margin="0,0,28,0" Padding="0,4,0,0">
+                            <StackPanel>
+                                <ContentPresenter x:Name="Header" ContentSource="Header"
+                                                  TextElement.FontSize="15"
+                                                  Opacity="0.7" />
+                                <Rectangle x:Name="Underline" Height="3" Width="20" RadiusX="1.5" RadiusY="1.5"
+                                           Margin="0,6,0,0" Fill="{DynamicResource AccentFillColorDefaultBrush}"
+                                           Visibility="Hidden" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Header" Property="Opacity" Value="1" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Header" Property="Opacity" Value="1" />
+                                <Setter TargetName="Header" Property="TextElement.FontWeight" Value="SemiBold" />
+                                <Setter TargetName="Underline" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Interrupteur on/off (CheckBox restylée) -->
+        <Style x:Key="Switch" TargetType="CheckBox">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="16,0,4,0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border x:Name="Track" Width="40" Height="20" CornerRadius="10" BorderThickness="1"
+                                Background="Transparent" BorderBrush="{DynamicResource TextFillColorSecondaryBrush}">
+                            <Ellipse x:Name="Knob" Width="12" Height="12" HorizontalAlignment="Left" Margin="3,0,0,0"
+                                     Fill="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Knob" Property="Width" Value="14" />
+                                <Setter TargetName="Knob" Property="Height" Value="14" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Track" Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                <Setter TargetName="Knob" Property="Fill" Value="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
+                                <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right" />
+                                <Setter TargetName="Knob" Property="Margin" Value="0,0,3,0" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Track" Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SettingCard" TargetType="Border" BasedOn="{StaticResource CardStyle}">
+            <Setter Property="Padding" Value="18,14" />
+            <Setter Property="Margin" Value="0,0,0,4" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.55" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SettingIcon" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource IconFont}" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Width" Value="22" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,16,0" />
+        </Style>
+
+        <Style x:Key="SettingDescription" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+        </Style>
+
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource DisplayFont}" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style x:Key="SubsectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,20,0,8" />
+        </Style>
     </Window.Resources>
 
     <Grid Margin="32,20,32,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="0,0,0,20">
+        <Grid Grid.Row="0" Margin="0,0,0,12">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock Text="&#xE917;" FontFamily="{StaticResource IconFont}" FontSize="22"
                            Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
@@ -57,7 +192,17 @@
             </StackPanel>
         </Grid>
 
-        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Padding="32,28"
+        <TabControl Grid.Row="1" Style="{StaticResource PivotTabControl}"
+                    ItemContainerStyle="{StaticResource PivotTab}">
+        <TabItem Header="Horloge" Tag="&#xE917;">
+        <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Style="{StaticResource CardStyle}" Padding="32,28"
                 DataContext="{Binding}">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -141,7 +286,7 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Row="2" Margin="0,28,0,12">
+        <Grid Grid.Row="1" Margin="0,28,0,12">
             <TextBlock Text="Vos villes" FontFamily="{StaticResource DisplayFont}" FontSize="20"
                        FontWeight="SemiBold" VerticalAlignment="Center" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
@@ -174,7 +319,7 @@
             </StackPanel>
         </Grid>
 
-        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0">
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0">
             <ItemsControl ItemsSource="{Binding Cities}" Margin="0,0,0,24">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -242,5 +387,162 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+        </Grid>
+        </TabItem>
+
+        <TabItem Header="Paramètres" Tag="&#xE713;">
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0">
+                <StackPanel Margin="0,0,0,24"
+                            DataContext="{Binding Settings}">
+
+                    <TextBlock Text="Rappels" Style="{StaticResource SectionTitle}" Margin="0,0,0,10" />
+
+                    <Border Style="{StaticResource SettingCard}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="&#xEA8F;" Style="{StaticResource SettingIcon}" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Activer les rappels" FontSize="14" />
+                                <TextBlock Style="{StaticResource SettingDescription}"
+                                           Text="Une petite notification aux moments clés de la journée dans vos villes : quand les bureaux ouvrent, à midi, le soir…" />
+                            </StackPanel>
+                            <CheckBox Grid.Column="2" Style="{StaticResource Switch}" IsChecked="{Binding RemindersEnabled}" />
+                        </Grid>
+                    </Border>
+
+                    <StackPanel IsEnabled="{Binding RemindersEnabled}">
+                        <TextBlock Text="Quand vous prévenir" Style="{StaticResource SubsectionTitle}" />
+
+                        <Border Style="{StaticResource SettingCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE706;" Style="{StaticResource SettingIcon}" Foreground="#FFB900" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Début de journée · 9 h" FontSize="14" />
+                                    <TextBlock Style="{StaticResource SettingDescription}"
+                                               Text="La ville se réveille : les bureaux et les boutiques ouvrent." />
+                                </StackPanel>
+                                <CheckBox Grid.Column="2" Style="{StaticResource Switch}" IsChecked="{Binding MorningReminder}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xEC32;" Style="{StaticResource SettingIcon}" Foreground="#F7630C" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Pause déjeuner · 12 h" FontSize="14" />
+                                    <TextBlock Style="{StaticResource SettingDescription}"
+                                               Text="C’est l’heure du déjeuner là-bas, en semaine comme le week-end." />
+                                </StackPanel>
+                                <CheckBox Grid.Column="2" Style="{StaticResource Switch}" IsChecked="{Binding LunchReminder}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE7E8;" Style="{StaticResource SettingIcon}" Foreground="#C239B3" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Fin de journée · 18 h" FontSize="14" />
+                                    <TextBlock Style="{StaticResource SettingDescription}"
+                                               Text="Les bureaux se vident et la soirée commence." />
+                                </StackPanel>
+                                <CheckBox Grid.Column="2" Style="{StaticResource Switch}" IsChecked="{Binding EveningReminder}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE708;" Style="{StaticResource SettingIcon}" Foreground="#8AB4F8" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Il se fait tard · 22 h" FontSize="14" />
+                                    <TextBlock Style="{StaticResource SettingDescription}"
+                                               Text="La soirée est avancée, la ville s’endort peu à peu." />
+                                </StackPanel>
+                                <CheckBox Grid.Column="2" Style="{StaticResource Switch}" IsChecked="{Binding NightReminder}" />
+                            </Grid>
+                        </Border>
+
+                        <TextBlock Text="Options" Style="{StaticResource SubsectionTitle}" />
+
+                        <Border Style="{StaticResource SettingCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE708;" Style="{StaticResource SettingIcon}" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Ne pas déranger la nuit" FontSize="14" />
+                                    <TextBlock Style="{StaticResource SettingDescription}"
+                                               Text="Aucun rappel entre 23 h et 7 h, heure de votre PC." />
+                                </StackPanel>
+                                <CheckBox Grid.Column="2" Style="{StaticResource Switch}" IsChecked="{Binding QuietHours}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE767;" Style="{StaticResource SettingIcon}" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Son" FontSize="14" />
+                                    <TextBlock Style="{StaticResource SettingDescription}"
+                                               Text="Jouer le son de notification de Windows avec chaque rappel." />
+                                </StackPanel>
+                                <CheckBox Grid.Column="2" Style="{StaticResource Switch}" IsChecked="{Binding PlaySound}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE946;" Style="{StaticResource SettingIcon}" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Aperçu" FontSize="14" />
+                                    <TextBlock Style="{StaticResource SettingDescription}"
+                                               Text="Les villes à la même heure que vous sont ignorées, et celles qui partagent la même heure sont regroupées en un seul rappel." />
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="Tester un rappel" Padding="14,6"
+                                        VerticalAlignment="Center" Click="TestReminder_Click" />
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+        </TabControl>
     </Grid>
 </Window>

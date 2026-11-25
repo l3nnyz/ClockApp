@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
+using ClockApp.Reminders;
 using ClockApp.ServiceAPI;
 
 namespace ClockApp
@@ -14,6 +15,10 @@ namespace ClockApp
         public ObservableCollection<CityClock> Cities { get; } = new();
 
         public IReadOnlyList<CityInfo> Catalog => CityInfo.Catalog;
+
+        public AppSettings Settings { get; } = AppSettings.Load();
+
+        public ReminderService Reminders { get; }
 
         private CityClock? _selected;
         public CityClock? Selected
@@ -43,6 +48,7 @@ namespace ClockApp
 
         public MainViewModel()
         {
+            Reminders = new ReminderService(Settings);
             foreach (var id in LoadSavedIds())
             {
                 var info = CityInfo.Catalog.FirstOrDefault(c => c.TimeZoneId == id);
@@ -64,6 +70,18 @@ namespace ClockApp
                 MinuteAngle = (t.TotalMinutes % 60) * 6;
                 HourAngle = (t.TotalHours % 12) * 30;
             }
+        }
+
+        public void CheckReminders() => Reminders.Check(Cities, DateTime.UtcNow);
+
+        public void TestReminder()
+        {
+            // Une ville à la même heure que le PC ne reçoit jamais de rappel : on en prend une autre si possible.
+            var localOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
+            bool Distant(CityClock c) => Math.Abs((c.Offset - localOffset).TotalMinutes) >= 1;
+
+            var city = Selected is { } s && Distant(s) ? s : Cities.FirstOrDefault(Distant) ?? Selected;
+            if (city is not null) Reminders.Test(city);
         }
 
         public async Task SyncAsync()
