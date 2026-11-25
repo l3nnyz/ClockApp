@@ -17,6 +17,8 @@ Application en **C#** (WPF, .NET 10) qui affiche l'heure de plusieurs villes du 
 - Repli sur les fuseaux horaires de Windows si l'API est injoignable
 - Onglet **Paramètres** avec des rappels activables (9 h, 12 h, 18 h, 22 h dans chaque ville) aux messages variés, regroupés par fuseau, avec mode « ne pas déranger » la nuit (réglages dans `%AppData%\ClockApp\parametres.json`)
 
+![Capture de l'onglet Paramètres](docs/screenshot-parametres.png)
+
 ## Lancer
 
 Nécessite Windows et le SDK .NET 10.
