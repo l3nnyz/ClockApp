@@ -49,8 +49,8 @@ namespace ClockApp
         {
             if (_hintShown) return;
             _hintShown = true;
-            _icon.ShowBalloonTip(4000, "Horloge mondiale",
-                "L'horloge continue en arrière-plan pour vos rappels. Clic droit sur l'icône pour quitter.",
+            _icon.ShowBalloonTip(4000, "Toujours là, en arrière-plan",
+                "Vos rappels continuent. Clic sur l'icône pour rouvrir, clic droit pour quitter.",
                 Forms.ToolTipIcon.None);
         }
 
