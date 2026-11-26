@@ -14,6 +14,7 @@ namespace ClockApp
     {
         private readonly MainViewModel _vm = new();
         private readonly DispatcherTimer _syncTimer = new() { Interval = TimeSpan.FromMinutes(15) };
+        private readonly DispatcherTimer _reminderTimer = new() { Interval = TimeSpan.FromSeconds(5) };
         private bool _allowClose;
         private Point _dragStart;
         private CityClock? _pressedCity;
@@ -32,6 +33,9 @@ namespace ClockApp
 
             IsVisibleChanged += OnIsVisibleChanged;
 
+            _reminderTimer.Tick += (_, _) => _vm.CheckReminders();
+            _vm.Reminders.Raised += OnReminderRaised;
+
             _syncTimer.Tick += async (_, _) => await _vm.SyncAsync();
             _syncTimer.Start();
             Dispatcher.InvokeAsync(_vm.SyncAsync);
@@ -46,10 +50,7 @@ namespace ClockApp
 
         public void StartBackgroundWork()
         {
-            var reminderTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
-            reminderTimer.Tick += (_, _) => _vm.CheckReminders();
-            reminderTimer.Start();
-            _vm.Reminders.Raised += OnReminderRaised;
+            if (!_reminderTimer.IsEnabled) _reminderTimer.Start();
         }
 
         public void AllowClose() => _allowClose = true;
