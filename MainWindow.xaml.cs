@@ -12,7 +12,7 @@ namespace ClockApp
 {
     public partial class MainWindow : Window
     {
-        private readonly MainViewModel _vm = new();
+        private readonly MainViewModel _vm;
         private readonly DispatcherTimer _syncTimer = new() { Interval = TimeSpan.FromMinutes(15) };
         private readonly DispatcherTimer _reminderTimer = new() { Interval = TimeSpan.FromSeconds(5) };
         private bool _allowClose;
@@ -25,8 +25,9 @@ namespace ClockApp
 
         public event Action? ExitRequested;
 
-        public MainWindow()
+        public MainWindow(AppSettings settings)
         {
+            _vm = new MainViewModel(settings);
             InitializeComponent();
             DataContext = _vm;
             DrawDialTicks();

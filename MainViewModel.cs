@@ -16,7 +16,7 @@ namespace ClockApp
 
         public IReadOnlyList<CityInfo> Catalog => CityInfo.Catalog;
 
-        public AppSettings Settings { get; } = AppSettings.Load();
+        public AppSettings Settings { get; }
 
         public ReminderService Reminders { get; }
 
@@ -46,8 +46,9 @@ namespace ClockApp
         public double MinuteAngle { get => _minuteAngle; private set => SetField(ref _minuteAngle, value); }
         public double SecondAngle { get => _secondAngle; private set => SetField(ref _secondAngle, value); }
 
-        public MainViewModel()
+        public MainViewModel(AppSettings settings)
         {
+            Settings = settings;
             Reminders = new ReminderService(Settings);
             foreach (var id in LoadSavedIds())
             {

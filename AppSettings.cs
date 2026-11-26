@@ -4,6 +4,8 @@ using ClockApp.Reminders;
 
 namespace ClockApp
 {
+    public enum AppTheme { System, Light, Dark }
+
     /// <summary>
     /// Paramètres de l'application, sauvegardés automatiquement dans
     /// %AppData%\ClockApp\parametres.json à chaque modification.
@@ -32,6 +34,9 @@ namespace ClockApp
         public bool ClockChangeReminder { get => _clockChangeReminder; set => SetField(ref _clockChangeReminder, value); }
 
         public List<string> NotifiedClockChanges { get; set; } = new();
+
+        private AppTheme _theme = AppTheme.System;
+        public AppTheme Theme { get => _theme; set => SetField(ref _theme, value); }
 
         private bool _quietHours = true;
         public bool QuietHours { get => _quietHours; set => SetField(ref _quietHours, value); }

@@ -574,6 +574,30 @@
                         </Border>
                     </StackPanel>
 
+                    <TextBlock Text="Apparence" Style="{StaticResource SectionTitle}" Margin="0,28,0,10" />
+
+                    <Border Style="{StaticResource SettingCard}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="&#xE790;" Style="{StaticResource SettingIcon}" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Thème" FontSize="14" />
+                                <TextBlock Style="{StaticResource SettingDescription}"
+                                           Text="Suivre le thème de Windows, ou forcer le mode clair ou sombre." />
+                            </StackPanel>
+                            <ComboBox Grid.Column="2" Width="160" VerticalAlignment="Center"
+                                      SelectedValuePath="Tag" SelectedValue="{Binding Theme}">
+                                <ComboBoxItem Content="Système" Tag="{x:Static m:AppTheme.System}" />
+                                <ComboBoxItem Content="Clair" Tag="{x:Static m:AppTheme.Light}" />
+                                <ComboBoxItem Content="Sombre" Tag="{x:Static m:AppTheme.Dark}" />
+                            </ComboBox>
+                        </Grid>
+                    </Border>
+
                     <TextBlock Text="Application" Style="{StaticResource SectionTitle}" Margin="0,28,0,10" />
 
                     <Border Style="{StaticResource SettingCard}">
