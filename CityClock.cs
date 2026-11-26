@@ -30,6 +30,9 @@ namespace ClockApp
         private bool _isSelected;
         public bool IsSelected { get => _isSelected; set => SetField(ref _isSelected, value); }
 
+        private bool _isDragging;
+        public bool IsDragging { get => _isDragging; set => SetField(ref _isDragging, value); }
+
         public DateTime Now { get; private set; }
 
         private string _timeText = "";

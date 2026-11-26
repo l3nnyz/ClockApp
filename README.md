@@ -12,7 +12,7 @@ Application en **C#** (WPF, .NET 10) qui affiche l'heure de plusieurs villes du 
 
 - Horloge analogique et numérique pour la ville sélectionnée
 - Cartes par ville : heure, date, décalage (« Demain, +8 h »), icône jour/nuit
-- Ajout / suppression de villes (liste sauvegardée dans `%AppData%\ClockApp\villes.json`)
+- Ajout / suppression de villes, réorganisables par glisser-déposer (liste sauvegardée dans `%AppData%\ClockApp\villes.json`)
 - Heure récupérée via l'API [timeapi.io](https://timeapi.io), resynchronisée toutes les 15 min
 - Repli sur les fuseaux horaires de Windows si l'API est injoignable
 - Onglet **Paramètres** avec des rappels activables (9 h, 12 h, 18 h, 22 h dans chaque ville) aux messages variés, regroupés par fuseau, avec mode « ne pas déranger » la nuit (réglages dans `%AppData%\ClockApp\parametres.json`)

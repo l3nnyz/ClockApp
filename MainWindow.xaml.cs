@@ -15,6 +15,8 @@ namespace ClockApp
         private readonly MainViewModel _vm = new();
         private readonly DispatcherTimer _syncTimer = new() { Interval = TimeSpan.FromMinutes(15) };
         private bool _allowClose;
+        private Point _dragStart;
+        private CityClock? _pressedCity;
 
         public MainViewModel ViewModel => _vm;
 
@@ -112,8 +114,63 @@ namespace ClockApp
             }
         }
 
+        private void CityCard_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is not FrameworkElement { DataContext: CityClock clock }) return;
+            _pressedCity = clock;
+            _dragStart = e.GetPosition(this);
+        }
+
+        private void CityCard_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_pressedCity is not { } city || e.LeftButton != MouseButtonState.Pressed) return;
+
+            var delta = e.GetPosition(this) - _dragStart;
+            if (Math.Abs(delta.X) < SystemParameters.MinimumHorizontalDragDistance
+                && Math.Abs(delta.Y) < SystemParameters.MinimumVerticalDragDistance) return;
+
+            _pressedCity = null;
+            var before = _vm.Cities.ToList();
+            city.IsDragging = true;
+            try
+            {
+                DragDrop.DoDragDrop((DependencyObject)sender, city, DragDropEffects.Move);
+            }
+            finally
+            {
+                city.IsDragging = false;
+                if (!before.SequenceEqual(_vm.Cities)) _vm.Save();
+            }
+        }
+
+        private void CityCard_DragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetData(typeof(CityClock)) is CityClock dragged
+                && sender is FrameworkElement { DataContext: CityClock target })
+            {
+                if (dragged != target) _vm.MoveCity(dragged, _vm.Cities.IndexOf(target));
+                e.Effects = DragDropEffects.Move;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+            e.Handled = true;
+        }
+
+        private void CityCard_Drop(object sender, DragEventArgs e) => e.Handled = true;
+
+        private void CardsScroller_PreviewDragOver(object sender, DragEventArgs e)
+        {
+            const double edge = 48, step = 12;
+            var y = e.GetPosition(CardsScroller).Y;
+            if (y < edge) CardsScroller.ScrollToVerticalOffset(CardsScroller.VerticalOffset - step);
+            else if (y > CardsScroller.ActualHeight - edge) CardsScroller.ScrollToVerticalOffset(CardsScroller.VerticalOffset + step);
+        }
+
         private void CityCard_Click(object sender, MouseButtonEventArgs e)
         {
+            _pressedCity = null;
             if (sender is FrameworkElement { DataContext: CityClock clock }) _vm.Selected = clock;
         }
 

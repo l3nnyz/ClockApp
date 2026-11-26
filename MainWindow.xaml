@@ -319,7 +319,8 @@
             </StackPanel>
         </Grid>
 
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0">
+        <ScrollViewer x:Name="CardsScroller" Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0"
+                      AllowDrop="True" PreviewDragOver="CardsScroller_PreviewDragOver">
             <ItemsControl ItemsSource="{Binding Cities}" Margin="0,0,0,24">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -329,7 +330,9 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type m:CityClock}">
                         <Border x:Name="Card" Width="250" Margin="0,0,12,12" Padding="20,16,12,18"
-                                Cursor="Hand" MouseLeftButtonUp="CityCard_Click">
+                                Cursor="Hand" AllowDrop="True" ToolTip="Glisser pour réorganiser" ToolTipService.InitialShowDelay="1500"
+                                MouseLeftButtonDown="CityCard_MouseDown" MouseMove="CityCard_MouseMove"
+                                MouseLeftButtonUp="CityCard_Click" DragOver="CityCard_DragOver" Drop="CityCard_Drop">
                             <Border.Style>
                                 <Style TargetType="Border" BasedOn="{StaticResource CardStyle}">
                                     <Style.Triggers>
@@ -381,6 +384,9 @@
                                 <Setter TargetName="Card" Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
                                 <Setter TargetName="Card" Property="BorderThickness" Value="2" />
                                 <Setter TargetName="Card" Property="Padding" Value="19,15,11,17" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsDragging}" Value="True">
+                                <Setter TargetName="Card" Property="Opacity" Value="0.4" />
                             </DataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>

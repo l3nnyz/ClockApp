@@ -141,6 +141,12 @@ namespace ClockApp
             Save();
         }
 
+        public void MoveCity(CityClock city, int index)
+        {
+            var from = Cities.IndexOf(city);
+            if (from >= 0 && index >= 0 && index < Cities.Count && from != index) Cities.Move(from, index);
+        }
+
         private static IEnumerable<string> LoadSavedIds()
         {
             try
@@ -155,7 +161,7 @@ namespace ClockApp
             return CityInfo.Defaults;
         }
 
-        private void Save()
+        public void Save()
         {
             try
             {
