@@ -74,6 +74,7 @@ namespace ClockApp
         public bool IsDay { get => _isDay; private set => SetField(ref _isDay, value); }
 
         private DateOnly _sunDate;
+        private TimeSpan? _sunOffset;
         private (DateTime Rise, DateTime Set)? _sun;
 
         private string _sunText = "";
@@ -122,11 +123,13 @@ namespace ClockApp
         private void UpdateSun(DateTime utcNow)
         {
             var date = DateOnly.FromDateTime(Now);
+            var changed = date != _sunDate || Offset != _sunOffset;
             if (date != _sunDate)
             {
                 _sunDate = date;
                 _sun = SunTimes.For(date, Info.Latitude, Info.Longitude);
             }
+            _sunOffset = Offset;
 
             if (_sun is not { } sun)
             {
@@ -137,6 +140,7 @@ namespace ClockApp
             }
 
             IsDay = utcNow >= sun.Rise && utcNow < sun.Set;
+            if (!changed) return;
             SunText = $"Lever {(sun.Rise + Offset).ToString("HH:mm", Fr)} · Coucher {(sun.Set + Offset).ToString("HH:mm", Fr)}";
             var length = sun.Set - sun.Rise;
             DayLengthText = $"{(int)length.TotalHours} h {length.Minutes:00} de jour";
