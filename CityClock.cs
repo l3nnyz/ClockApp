@@ -73,6 +73,15 @@ namespace ClockApp
         private bool _isDay;
         public bool IsDay { get => _isDay; private set => SetField(ref _isDay, value); }
 
+        private DateOnly _sunDate;
+        private (DateTime Rise, DateTime Set)? _sun;
+
+        private string _sunText = "";
+        public string SunText { get => _sunText; private set => SetField(ref _sunText, value); }
+
+        private string _dayLengthText = "";
+        public string DayLengthText { get => _dayLengthText; private set => SetField(ref _dayLengthText, value); }
+
         public void SetApiOffset(TimeSpan offset)
         {
             Offset = offset;
@@ -93,7 +102,7 @@ namespace ClockApp
             SecondsText = Now.ToString("ss", Fr);
             var date = Now.ToString("dddd d MMMM yyyy", Fr);
             DateText = char.ToUpper(date[0], Fr) + date[1..];
-            IsDay = Now.Hour is >= 7 and < 19;
+            UpdateSun(utcNow);
 
             var zoneOffset = TimeSpan.FromMinutes(Math.Round(Offset.TotalMinutes / 15) * 15);
             var localOffset = TimeZoneInfo.Local.GetUtcOffset(utcNow);
@@ -108,6 +117,29 @@ namespace ClockApp
             };
             var diff = zoneOffset - localOffset;
             RelativeText = diff == TimeSpan.Zero ? $"{day}, même heure" : $"{day}, {FormatOffset(diff, " h ")}";
+        }
+
+        private void UpdateSun(DateTime utcNow)
+        {
+            var date = DateOnly.FromDateTime(Now);
+            if (date != _sunDate)
+            {
+                _sunDate = date;
+                _sun = SunTimes.For(date, Info.Latitude, Info.Longitude);
+            }
+
+            if (_sun is not { } sun)
+            {
+                IsDay = Now.Hour is >= 7 and < 19;
+                SunText = "";
+                DayLengthText = "";
+                return;
+            }
+
+            IsDay = utcNow >= sun.Rise && utcNow < sun.Set;
+            SunText = $"Lever {(sun.Rise + Offset).ToString("HH:mm", Fr)} · Coucher {(sun.Set + Offset).ToString("HH:mm", Fr)}";
+            var length = sun.Set - sun.Rise;
+            DayLengthText = $"{(int)length.TotalHours} h {length.Minutes:00} de jour";
         }
 
         internal static string FormatOffset(TimeSpan t, string sep)

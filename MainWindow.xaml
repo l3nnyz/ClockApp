@@ -261,7 +261,17 @@
                                    Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
                     </StackPanel>
 
-                    <TextBlock Text="{Binding DateText}" FontSize="18" Margin="0,-6,0,10" />
+                    <TextBlock Text="{Binding DateText}" FontSize="18" Margin="0,-6,0,4" />
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Text="&#xE706;" FontFamily="{StaticResource IconFont}" FontSize="14"
+                                   VerticalAlignment="Center" Margin="0,1,8,0" Foreground="#FFB900" />
+                        <TextBlock FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                            <Run Text="{Binding SunText, Mode=OneWay}" />
+                            <Run Text="·" />
+                            <Run Text="{Binding DayLengthText, Mode=OneWay}" />
+                        </TextBlock>
+                    </StackPanel>
 
                     <StackPanel Orientation="Horizontal">
                         <Ellipse Width="8" Height="8" VerticalAlignment="Center" Margin="0,1,8,0">
@@ -371,6 +381,8 @@
                                 <StackPanel Grid.Row="2">
                                     <TextBlock Text="{Binding RelativeText}" FontSize="13" />
                                     <TextBlock Text="{Binding DateText}" FontSize="12" Margin="0,2,0,0"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    <TextBlock Text="{Binding SunText}" FontSize="12" Margin="0,2,0,0"
                                                Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                                     <StackPanel x:Name="ClockChangeLine" Orientation="Horizontal" Margin="0,8,0,0">
                                         <TextBlock Text="&#xE823;" FontFamily="{StaticResource IconFont}" FontSize="12"
