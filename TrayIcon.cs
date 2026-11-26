@@ -5,7 +5,7 @@ using Forms = System.Windows.Forms;
 
 namespace ClockApp
 {
-    public sealed class TrayIcon
+    public sealed class TrayIcon : IDisposable
     {
         private readonly Forms.NotifyIcon _icon;
         private readonly Forms.ToolStripMenuItem _remindersItem;
@@ -52,6 +52,14 @@ namespace ClockApp
             _icon.ShowBalloonTip(4000, "Toujours là, en arrière-plan",
                 "Vos rappels continuent. Clic sur l'icône pour rouvrir, clic droit pour quitter.",
                 Forms.ToolTipIcon.None);
+        }
+
+        public void Dispose()
+        {
+            _icon.Visible = false;
+            _icon.ContextMenuStrip?.Dispose();
+            _icon.Icon?.Dispose();
+            _icon.Dispose();
         }
 
         private static Icon CreateClockIcon()

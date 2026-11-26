@@ -45,6 +45,13 @@ namespace ClockApp
             if (ThemeMode != mode) ThemeMode = mode;
         }
 
+        protected override void OnExit(ExitEventArgs e)
+        {
+            _tray?.Dispose();
+            _tray = null;
+            base.OnExit(e);
+        }
+
         private void Quit()
         {
             _window?.AllowClose();
