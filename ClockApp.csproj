@@ -9,7 +9,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyTitle>Horloge mondiale</AssemblyTitle>
     <Product>Horloge mondiale</Product>
-    <Version>1.3.1</Version>
+    <Version>1.4.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

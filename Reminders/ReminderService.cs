@@ -20,6 +20,8 @@ namespace ClockApp.Reminders
             var localNow = utcNow + localOffset;
             if (settings.QuietHours && IsQuietHour(localNow)) return;
 
+            if (settings.ClockChangeReminder) CheckClockChanges(cities, utcNow);
+
             var due = new List<(ReminderKind Kind, DateTime CityTime, string City)>();
             foreach (var city in cities)
             {
@@ -64,6 +66,32 @@ namespace ClockApp.Reminders
 
             if (_messages.Compose(kind, [city.City], cityTime, localTime) is { } reminder)
                 Raised?.Invoke(reminder);
+        }
+
+        private void CheckClockChanges(IEnumerable<CityClock> cities, DateTime utcNow)
+        {
+            var local = ClockChanges.Next(TimeZoneInfo.Local, utcNow, ClockChanges.AlertHorizon);
+            if (local is not null && settings.MarkClockChangeNotified($"local|{local.Utc:O}"))
+                Raised?.Invoke(ClockChanges.LocalReminder(local, utcNow));
+
+            var due = new List<CityClock>();
+            foreach (var city in cities)
+            {
+                city.RefreshClockChange(utcNow);
+                if (city.NextClockChange is not { } change || change.Utc - utcNow > ClockChanges.AlertHorizon) continue;
+                if (local is not null && local.Utc == change.Utc && local.After - local.Before == change.After - change.Before)
+                {
+                    settings.MarkClockChangeNotified($"{city.TimeZoneId}|{change.Utc:O}");
+                    continue;
+                }
+                if (settings.MarkClockChangeNotified($"{city.TimeZoneId}|{change.Utc:O}")) due.Add(city);
+            }
+
+            foreach (var group in due.GroupBy(c => (c.NextClockChange!, GapBefore: ClockChanges.GapBefore(c.Zone!, c.NextClockChange!.Utc))))
+            {
+                var first = group.First();
+                Raised?.Invoke(ClockChanges.CityReminder(group.Select(c => c.City).ToList(), first.Zone!, first.NextClockChange!, utcNow));
+            }
         }
 
         private static bool IsQuietHour(DateTime local) => local.Hour is >= 23 or < 7;

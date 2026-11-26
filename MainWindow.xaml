@@ -372,6 +372,13 @@
                                     <TextBlock Text="{Binding RelativeText}" FontSize="13" />
                                     <TextBlock Text="{Binding DateText}" FontSize="12" Margin="0,2,0,0"
                                                Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    <StackPanel x:Name="ClockChangeLine" Orientation="Horizontal" Margin="0,8,0,0">
+                                        <TextBlock Text="&#xE823;" FontFamily="{StaticResource IconFont}" FontSize="12"
+                                                   VerticalAlignment="Top" Margin="0,2,6,0"
+                                                   Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="{Binding ClockChangeText}" FontSize="12" TextWrapping="Wrap" MaxWidth="196"
+                                                   Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+                                    </StackPanel>
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -387,6 +394,9 @@
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsDragging}" Value="True">
                                 <Setter TargetName="Card" Property="Opacity" Value="0.4" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ClockChangeText}" Value="">
+                                <Setter TargetName="ClockChangeLine" Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>
@@ -489,6 +499,23 @@
                                                Text="La soirée est avancée, la ville s’endort peu à peu." />
                                 </StackPanel>
                                 <CheckBox Grid.Column="2" Style="{StaticResource Switch}" IsChecked="{Binding NightReminder}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SettingCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE823;" Style="{StaticResource SettingIcon}" Foreground="#4CC2FF" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Changements d’heure" FontSize="14" />
+                                    <TextBlock Style="{StaticResource SettingDescription}"
+                                               Text="Prévenir deux jours avant qu’une ville (ou vous) passe à l’heure d’été ou d’hiver, avec le nouvel écart." />
+                                </StackPanel>
+                                <CheckBox Grid.Column="2" Style="{StaticResource Switch}" IsChecked="{Binding ClockChangeReminder}" />
                             </Grid>
                         </Border>
 

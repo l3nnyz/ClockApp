@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace ClockApp.Reminders
 {
-    public enum ReminderKind { Morning, Lunch, Evening, Night }
+    public enum ReminderKind { Morning, Lunch, Evening, Night, ClockChange }
 
     public sealed record Reminder(ReminderKind Kind, string Title, string Body);
 
@@ -332,7 +332,7 @@ namespace ClockApp.Reminders
         private static string FormatHour(DateTime t) =>
             t.Minute == 0 ? $"{t.Hour} h" : $"{t.Hour} h {t.Minute:00}";
 
-        private static string JoinCities(IReadOnlyList<string> names) => names.Count switch
+        internal static string JoinCities(IReadOnlyList<string> names) => names.Count switch
         {
             1 => names[0],
             <= 3 => string.Join(", ", names.Take(names.Count - 1)) + " et " + names[^1],
@@ -355,7 +355,7 @@ namespace ClockApp.Reminders
             : city.StartsWith("Les ", StringComparison.Ordinal) ? "aux " + city[4..]
             : "à " + city;
 
-        private static string Capitalize(string s) => s.Length == 0 ? s : char.ToUpper(s[0], Fr) + s[1..];
+        internal static string Capitalize(string s) => s.Length == 0 ? s : char.ToUpper(s[0], Fr) + s[1..];
 
         [GeneratedRegex(@"\[([^|\]]*)\|([^\]]*)\]")]
         private static partial Regex Agreement();

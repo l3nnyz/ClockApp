@@ -28,6 +28,11 @@ namespace ClockApp
         private bool _nightReminder;
         public bool NightReminder { get => _nightReminder; set => SetField(ref _nightReminder, value); }
 
+        private bool _clockChangeReminder = true;
+        public bool ClockChangeReminder { get => _clockChangeReminder; set => SetField(ref _clockChangeReminder, value); }
+
+        public List<string> NotifiedClockChanges { get; set; } = new();
+
         private bool _quietHours = true;
         public bool QuietHours { get => _quietHours; set => SetField(ref _quietHours, value); }
 
@@ -48,6 +53,15 @@ namespace ClockApp
             ReminderKind.Night => NightReminder,
             _ => false,
         };
+
+        public bool MarkClockChangeNotified(string key)
+        {
+            if (NotifiedClockChanges.Contains(key)) return false;
+            NotifiedClockChanges.Add(key);
+            if (NotifiedClockChanges.Count > 100) NotifiedClockChanges.RemoveRange(0, NotifiedClockChanges.Count - 100);
+            Save();
+            return true;
+        }
 
         public static AppSettings Load()
         {

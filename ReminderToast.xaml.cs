@@ -26,6 +26,7 @@ namespace ClockApp
                 ReminderKind.Morning => ("", Brush("#FFB900")),   // soleil
                 ReminderKind.Lunch => ("", Brush("#F7630C")),     // tasse
                 ReminderKind.Evening => ("", Brush("#C239B3")),   // départ
+                ReminderKind.ClockChange => ("", Brush("#4CC2FF")),
                 _ => ("", Brush("#8AB4F8")),                      // lune
             };
 

@@ -6,10 +6,30 @@ namespace ClockApp
     {
         private static readonly CultureInfo Fr = CultureInfo.GetCultureInfo("fr-FR");
 
+        private DateTime _clockChangeCheckedAt = DateTime.MinValue;
+
         public CityClock(CityInfo info)
         {
             Info = info;
+            try { Zone = TimeZoneInfo.FindSystemTimeZoneById(info.TimeZoneId); }
+            catch (TimeZoneNotFoundException) { }
             ApplyFallbackOffset();
+        }
+
+        public TimeZoneInfo? Zone { get; }
+
+        public ClockChange? NextClockChange { get; private set; }
+
+        private string _clockChangeText = "";
+        public string ClockChangeText { get => _clockChangeText; private set => SetField(ref _clockChangeText, value); }
+
+        public void RefreshClockChange(DateTime utcNow)
+        {
+            if (Zone is null) return;
+            if (utcNow >= _clockChangeCheckedAt && utcNow - _clockChangeCheckedAt < TimeSpan.FromMinutes(10)) return;
+            _clockChangeCheckedAt = utcNow;
+            NextClockChange = ClockChanges.Next(Zone, utcNow, ClockChanges.CardHorizon);
+            ClockChangeText = ClockChanges.CardText(Zone, utcNow);
         }
 
         public CityInfo Info { get; }
@@ -61,20 +81,14 @@ namespace ClockApp
 
         public void ApplyFallbackOffset()
         {
-            try
-            {
-                Offset = TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId).GetUtcOffset(DateTime.UtcNow);
-            }
-            catch (TimeZoneNotFoundException)
-            {
-                Offset = TimeSpan.Zero;
-            }
+            Offset = Zone?.GetUtcOffset(DateTime.UtcNow) ?? TimeSpan.Zero;
             IsSynced = false;
         }
 
         public void Update(DateTime utcNow)
         {
             Now = utcNow + Offset;
+            RefreshClockChange(utcNow);
             TimeText = Now.ToString("HH:mm", Fr);
             SecondsText = Now.ToString("ss", Fr);
             var date = Now.ToString("dddd d MMMM yyyy", Fr);
@@ -96,7 +110,7 @@ namespace ClockApp
             RelativeText = diff == TimeSpan.Zero ? $"{day}, même heure" : $"{day}, {FormatOffset(diff, " h ")}";
         }
 
-        private static string FormatOffset(TimeSpan t, string sep)
+        internal static string FormatOffset(TimeSpan t, string sep)
         {
             var sign = t < TimeSpan.Zero ? "−" : "+";
             var a = t.Duration();
