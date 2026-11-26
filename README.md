@@ -32,3 +32,9 @@ Nécessite Windows et le SDK .NET 10.
   ```
   dotnet run
   ```
+
+## À faire
+
+- [ ] Météo de chaque ville sur les cartes
+- [ ] Carte du monde interactive qui affiche l'heure des villes
+- [ ] Setup d'installation
