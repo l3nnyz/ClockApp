@@ -418,6 +418,10 @@
         </Grid>
         </TabItem>
 
+        <TabItem Header="Carte" Tag="&#xE909;">
+            <m:WorldMap x:Name="Map" Margin="0,16,0,24" />
+        </TabItem>
+
         <TabItem Header="Paramètres" Tag="&#xE713;">
 
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,-16,0" Padding="0,0,16,0">

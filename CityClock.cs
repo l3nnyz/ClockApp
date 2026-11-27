@@ -1,4 +1,5 @@
 using System.Globalization;
+using ClockApp.ServiceAPI;
 
 namespace ClockApp
 {
@@ -76,6 +77,9 @@ namespace ClockApp
         private DateOnly _sunDate;
         private TimeSpan? _sunOffset;
         private (DateTime Rise, DateTime Set)? _sun;
+        private DateOnly _sunApiDate;
+        private DateTime _sunApiRetryAt = DateTime.MinValue;
+        private bool _sunApiBusy;
 
         private string _sunText = "";
         public string SunText { get => _sunText; private set => SetField(ref _sunText, value); }
@@ -127,9 +131,11 @@ namespace ClockApp
             if (date != _sunDate)
             {
                 _sunDate = date;
-                _sun = SunTimes.For(date, Info.Latitude, Info.Longitude);
+                _sun = null;
             }
             _sunOffset = Offset;
+            if (date != _sunApiDate && !_sunApiBusy && utcNow >= _sunApiRetryAt)
+                _ = FetchSunAsync(date, utcNow);
 
             if (_sun is not { } sun)
             {
@@ -144,6 +150,22 @@ namespace ClockApp
             SunText = $"Lever {(sun.Rise + Offset).ToString("HH:mm", Fr)} · Coucher {(sun.Set + Offset).ToString("HH:mm", Fr)}";
             var length = sun.Set - sun.Rise;
             DayLengthText = $"{(int)length.TotalHours} h {length.Minutes:00} de jour";
+        }
+
+        private async Task FetchSunAsync(DateOnly date, DateTime utcNow)
+        {
+            _sunApiBusy = true;
+            var (ok, sun) = await SunApiService.GetAsync(date, Info.Latitude, Info.Longitude);
+            _sunApiBusy = false;
+            if (!ok)
+            {
+                _sunApiRetryAt = utcNow + TimeSpan.FromMinutes(15);
+                return;
+            }
+            _sunApiDate = date;
+            if (date != _sunDate) return;
+            _sun = sun;
+            _sunOffset = null;
         }
 
         internal static string FormatOffset(TimeSpan t, string sep)

@@ -31,6 +31,8 @@ namespace ClockApp
             InitializeComponent();
             DataContext = _vm;
             DrawDialTicks();
+            Map.Cities = _vm.Cities;
+            Map.CityClicked += c => _vm.Selected = c;
 
             IsVisibleChanged += OnIsVisibleChanged;
 
