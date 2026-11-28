@@ -313,7 +313,8 @@ namespace ClockApp.Reminders
                 _recent[(kind, isTitle)] = recent = new Queue<Line>();
 
             var fresh = pool.Where(l => !recent.Contains(l)).ToList();
-            var candidates = fresh.Count > 0 ? fresh : pool;
+            var candidates = pool;
+            if (fresh.Count > 0) candidates = fresh;
             var line = candidates[_random.Next(candidates.Count)];
 
             recent.Enqueue(line);
@@ -323,14 +324,23 @@ namespace ClockApp.Reminders
 
         private static string Fill(string text, Dictionary<string, string> values, int count)
         {
-            text = Agreement().Replace(text, m => count > 1 ? m.Groups[2].Value : m.Groups[1].Value);
-            text = Token().Replace(text, m => values.TryGetValue(m.Groups[1].Value, out var v) ? v : m.Value);
+            var form = 1;
+            if (count > 1) form = 2;
+            text = Agreement().Replace(text, m => m.Groups[form].Value);
+            text = Token().Replace(text, m =>
+            {
+                if (values.TryGetValue(m.Groups[1].Value, out var value)) return value;
+                return m.Value;
+            });
             return Capitalize(text);
         }
 
         /// <summary>« 9 h », « 14 h 05 » (espaces insécables pour ne pas couper l'heure en fin de ligne).</summary>
-        private static string FormatHour(DateTime t) =>
-            t.Minute == 0 ? $"{t.Hour} h" : $"{t.Hour} h {t.Minute:00}";
+        private static string FormatHour(DateTime t)
+        {
+            if (t.Minute == 0) return $"{t.Hour} h";
+            return $"{t.Hour} h {t.Minute:00}";
+        }
 
         internal static string JoinCities(IReadOnlyList<string> names) => names.Count switch
         {
@@ -350,12 +360,18 @@ namespace ClockApp.Reminders
         private static bool HasArticle(string city) =>
             city.StartsWith("Le ", StringComparison.Ordinal) || city.StartsWith("Les ", StringComparison.Ordinal);
 
-        private static string At(string city) =>
-            city.StartsWith("Le ", StringComparison.Ordinal) ? "au " + city[3..]
-            : city.StartsWith("Les ", StringComparison.Ordinal) ? "aux " + city[4..]
-            : "à " + city;
+        private static string At(string city)
+        {
+            if (city.StartsWith("Le ", StringComparison.Ordinal)) return "au " + city[3..];
+            if (city.StartsWith("Les ", StringComparison.Ordinal)) return "aux " + city[4..];
+            return "à " + city;
+        }
 
-        internal static string Capitalize(string s) => s.Length == 0 ? s : char.ToUpper(s[0], Fr) + s[1..];
+        internal static string Capitalize(string s)
+        {
+            if (s.Length == 0) return s;
+            return char.ToUpper(s[0], Fr) + s[1..];
+        }
 
         [GeneratedRegex(@"\[([^|\]]*)\|([^\]]*)\]")]
         private static partial Regex Agreement();

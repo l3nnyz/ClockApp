@@ -6,7 +6,14 @@ namespace ClockApp
     public sealed record ClockChange(DateTime Utc, TimeSpan Before, TimeSpan After)
     {
         public bool IsSummerTime => After > Before;
-        public string Season => IsSummerTime ? "l’heure d’été" : "l’heure d’hiver";
+        public string Season
+        {
+            get
+            {
+                if (IsSummerTime) return "l’heure d’été";
+                return "l’heure d’hiver";
+            }
+        }
     }
 
     public static class ClockChanges
@@ -35,8 +42,11 @@ namespace ClockApp
         public static TimeSpan GapAfter(TimeZoneInfo zone, DateTime utc) =>
             zone.GetUtcOffset(utc) - TimeZoneInfo.Local.GetUtcOffset(utc);
 
-        public static string Gap(TimeSpan gap) =>
-            gap == TimeSpan.Zero ? "même heure" : CityClock.FormatOffset(gap, " h ");
+        public static string Gap(TimeSpan gap)
+        {
+            if (gap == TimeSpan.Zero) return "même heure";
+            return CityClock.FormatOffset(gap, " h ");
+        }
 
         public static string Day(DateTime utc, DateTime utcNow, TimeZoneInfo zone)
         {
@@ -54,31 +64,37 @@ namespace ClockApp
         {
             var city = Next(zone, utcNow, CardHorizon);
             var local = Next(TimeZoneInfo.Local, utcNow, CardHorizon);
-            var change = city is not null && (local is null || city.Utc <= local.Utc) ? city : local;
-            if (change is null) return "";
+            if (city is not null && (local is null || city.Utc <= local.Utc))
+            {
+                var cityBefore = GapBefore(zone, city.Utc);
+                var cityAfter = GapAfter(zone, city.Utc);
+                var cityDay = Day(city.Utc, utcNow, zone);
+                if (cityBefore == cityAfter) return $"Passe à {city.Season} {cityDay}, comme vous";
+                return $"Passe à {city.Season} {cityDay} · écart {Gap(cityBefore)} → {Gap(cityAfter)}";
+            }
 
-            var before = GapBefore(zone, change.Utc);
-            var after = GapAfter(zone, change.Utc);
-            var day = Day(change.Utc, utcNow, change == city ? zone : TimeZoneInfo.Local);
+            if (local is null) return "";
 
-            if (change == city)
-                return before == after
-                    ? $"Passe à {change.Season} {day}, comme vous"
-                    : $"Passe à {change.Season} {day} · écart {Gap(before)} → {Gap(after)}";
+            var before = GapBefore(zone, local.Utc);
+            var after = GapAfter(zone, local.Utc);
+            if (before == after) return "";
 
-            return before == after ? "" : $"{ReminderMessages.Capitalize(day)}, l’écart passe de {Gap(before)} à {Gap(after)}";
+            var day = Day(local.Utc, utcNow, TimeZoneInfo.Local);
+            return $"{ReminderMessages.Capitalize(day)}, l’écart passe de {Gap(before)} à {Gap(after)}";
         }
 
         public static Reminder CityReminder(IReadOnlyList<string> cities, TimeZoneInfo zone, ClockChange change, DateTime utcNow)
         {
             var names = ReminderMessages.JoinCities(cities);
-            var verb = cities.Count > 1 ? "passent" : "passe";
+            var verb = "passe";
+            if (cities.Count > 1) verb = "passent";
+
             var before = GapBefore(zone, change.Utc);
             var after = GapAfter(zone, change.Utc);
             var day = ReminderMessages.Capitalize(Day(change.Utc, utcNow, zone));
-            var body = before == after
-                ? $"{day}, {names} {verb} à {change.Season}, comme vous : l’écart ne change pas."
-                : $"{day}, {names} {verb} à {change.Season} : l’écart avec vous passe de {Gap(before)} à {Gap(after)}.";
+
+            var body = $"{day}, {names} {verb} à {change.Season} : l’écart avec vous passe de {Gap(before)} à {Gap(after)}.";
+            if (before == after) body = $"{day}, {names} {verb} à {change.Season}, comme vous : l’écart ne change pas.";
             return new Reminder(ReminderKind.ClockChange, $"Changement d’heure : {names}", body);
         }
 

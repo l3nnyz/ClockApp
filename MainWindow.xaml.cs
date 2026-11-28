@@ -109,15 +109,21 @@ namespace ClockApp
             {
                 var major = i % 5 == 0;
                 var angle = i * 6 * Math.PI / 180;
-                double outer = 90, inner = major ? 80 : 86;
+                double outer = 90, inner = 86, thickness = 1.2, opacity = 0.4;
+                if (major)
+                {
+                    inner = 80;
+                    thickness = 3;
+                    opacity = 0.9;
+                }
                 var tick = new Line
                 {
                     X1 = c + inner * Math.Sin(angle), Y1 = c - inner * Math.Cos(angle),
                     X2 = c + outer * Math.Sin(angle), Y2 = c - outer * Math.Cos(angle),
-                    StrokeThickness = major ? 3 : 1.2,
+                    StrokeThickness = thickness,
                     StrokeStartLineCap = PenLineCap.Round,
                     StrokeEndLineCap = PenLineCap.Round,
-                    Opacity = major ? 0.9 : 0.4,
+                    Opacity = opacity,
                 };
                 tick.SetResourceReference(Shape.StrokeProperty, "TextFillColorPrimaryBrush");
                 DialTicks.Children.Add(tick);

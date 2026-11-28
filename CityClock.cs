@@ -46,7 +46,14 @@ namespace ClockApp
             get => _isSynced;
             private set { if (SetField(ref _isSynced, value)) OnPropertyChanged(nameof(SourceText)); }
         }
-        public string SourceText => IsSynced ? "Synchronisé via timeapi.io" : "Heure système (hors ligne)";
+        public string SourceText
+        {
+            get
+            {
+                if (IsSynced) return "Synchronisé via timeapi.io";
+                return "Heure système (hors ligne)";
+            }
+        }
 
         private bool _isSelected;
         public bool IsSelected { get => _isSelected; set => SetField(ref _isSelected, value); }
@@ -111,7 +118,8 @@ namespace ClockApp
 
             var zoneOffset = TimeSpan.FromMinutes(Math.Round(Offset.TotalMinutes / 15) * 15);
             var localOffset = TimeZoneInfo.Local.GetUtcOffset(utcNow);
-            UtcText = zoneOffset == TimeSpan.Zero ? "UTC" : "UTC" + FormatOffset(zoneOffset, ":");
+            UtcText = "UTC";
+            if (zoneOffset != TimeSpan.Zero) UtcText += FormatOffset(zoneOffset, ":");
 
             var localDate = (utcNow + localOffset).Date;
             var day = (Now.Date - localDate).Days switch
@@ -121,7 +129,8 @@ namespace ClockApp
                 _ => "Aujourd’hui",
             };
             var diff = zoneOffset - localOffset;
-            RelativeText = diff == TimeSpan.Zero ? $"{day}, même heure" : $"{day}, {FormatOffset(diff, " h ")}";
+            if (diff == TimeSpan.Zero) RelativeText = $"{day}, même heure";
+            else RelativeText = $"{day}, {FormatOffset(diff, " h ")}";
         }
 
         private void UpdateSun(DateTime utcNow)
@@ -170,12 +179,20 @@ namespace ClockApp
 
         internal static string FormatOffset(TimeSpan t, string sep)
         {
-            var sign = t < TimeSpan.Zero ? "−" : "+";
+            var sign = "+";
+            if (t < TimeSpan.Zero) sign = "−";
+
             var a = t.Duration();
-            var hours = (int)a.TotalHours;
+            var text = $"{sign}{(int)a.TotalHours}";
             if (sep == ":")
-                return a.Minutes == 0 ? $"{sign}{hours}" : $"{sign}{hours}:{a.Minutes:00}";
-            return a.Minutes == 0 ? $"{sign}{hours} h" : $"{sign}{hours} h {a.Minutes:00}";
+            {
+                if (a.Minutes != 0) text += $":{a.Minutes:00}";
+                return text;
+            }
+
+            text += " h";
+            if (a.Minutes != 0) text += $" {a.Minutes:00}";
+            return text;
         }
     }
 }

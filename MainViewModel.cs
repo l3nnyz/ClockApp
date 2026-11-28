@@ -81,7 +81,9 @@ namespace ClockApp
             var localOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
             bool Distant(CityClock c) => Math.Abs((c.Offset - localOffset).TotalMinutes) >= 1;
 
-            var city = Selected is { } s && Distant(s) ? s : Cities.FirstOrDefault(Distant) ?? Selected;
+            var city = Selected;
+            if (city is null || !Distant(city))
+                city = Cities.FirstOrDefault(Distant) ?? Selected;
             if (city is not null) Reminders.Test(city);
         }
 
@@ -107,11 +109,12 @@ namespace ClockApp
             }
 
             var at = DateTime.Now.ToString("HH:mm", CultureInfo.GetCultureInfo("fr-FR"));
-            StatusText = ok == cities.Count
-                ? $"Synchronisé via timeapi.io à {at}"
-                : ok == 0
-                    ? $"API injoignable — heure système utilisée ({at})"
-                    : $"{ok}/{cities.Count} villes synchronisées à {at}";
+            if (ok == cities.Count)
+                StatusText = $"Synchronisé via timeapi.io à {at}";
+            else if (ok == 0)
+                StatusText = $"API injoignable — heure système utilisée ({at})";
+            else
+                StatusText = $"{ok}/{cities.Count} villes synchronisées à {at}";
             IsSyncing = false;
             Tick();
         }
@@ -138,7 +141,10 @@ namespace ClockApp
             var index = Cities.IndexOf(clock);
             Cities.Remove(clock);
             if (Selected == clock)
-                Selected = Cities.Count == 0 ? null : Cities[Math.Min(index, Cities.Count - 1)];
+            {
+                Selected = null;
+                if (Cities.Count > 0) Selected = Cities[Math.Min(index, Cities.Count - 1)];
+            }
             Save();
         }
 

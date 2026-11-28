@@ -70,12 +70,14 @@ namespace ClockApp
 
         public static AppSettings Load()
         {
-            AppSettings settings;
+            var settings = new AppSettings();
             try
             {
-                settings = File.Exists(SettingsPath)
-                    ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(SettingsPath)) ?? new AppSettings()
-                    : new AppSettings();
+                if (File.Exists(SettingsPath))
+                {
+                    var saved = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(SettingsPath));
+                    if (saved is not null) settings = saved;
+                }
             }
             catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException)
             {
