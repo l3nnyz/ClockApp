@@ -24,8 +24,8 @@ namespace ClockApp
             (KindIcon.Text, KindIcon.Foreground) = reminder.Kind switch
             {
                 ReminderKind.Morning => ("", Brush("#FFB900")),   // soleil
-                ReminderKind.Lunch => ("", Brush("#F7630C")),     // tasse
-                ReminderKind.Evening => ("", Brush("#C239B3")),   // départ
+                ReminderKind.Lunch => ("", Brush("#F7630C")),     
+                ReminderKind.Evening => ("", Brush("#C239B3")),  
                 ReminderKind.ClockChange => ("", Brush("#4CC2FF")),
                 _ => ("", Brush("#8AB4F8")),                      // lune
             };
@@ -61,7 +61,7 @@ namespace ClockApp
                 if (!t.IsLoaded) continue;
                 t.Left = area.Right - t.ActualWidth;
                 t.Top = bottom - t.ActualHeight;
-                bottom = t.Top + 12; // les marges de l'ombre se chevauchent
+                bottom = t.Top + 12;
             }
         }
 

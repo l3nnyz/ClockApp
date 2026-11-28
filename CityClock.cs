@@ -94,6 +94,18 @@ namespace ClockApp
         private string _dayLengthText = "";
         public string DayLengthText { get => _dayLengthText; private set => SetField(ref _dayLengthText, value); }
 
+        private DateTime _weatherNextAt = DateTime.MinValue;
+        private bool _weatherBusy;
+
+        private string _weatherText = "";
+        public string WeatherText { get => _weatherText; private set => SetField(ref _weatherText, value); }
+
+        private string _weatherGlyph = "";
+        public string WeatherGlyph { get => _weatherGlyph; private set => SetField(ref _weatherGlyph, value); }
+
+        private string _temperatureText = "";
+        public string TemperatureText { get => _temperatureText; private set => SetField(ref _temperatureText, value); }
+
         public void SetApiOffset(TimeSpan offset)
         {
             Offset = offset;
@@ -115,6 +127,7 @@ namespace ClockApp
             var date = Now.ToString("dddd d MMMM yyyy", Fr);
             DateText = char.ToUpper(date[0], Fr) + date[1..];
             UpdateSun(utcNow);
+            if (!_weatherBusy && utcNow >= _weatherNextAt) _ = FetchWeatherAsync(utcNow);
 
             var zoneOffset = TimeSpan.FromMinutes(Math.Round(Offset.TotalMinutes / 15) * 15);
             var localOffset = TimeZoneInfo.Local.GetUtcOffset(utcNow);
@@ -175,6 +188,25 @@ namespace ClockApp
             if (date != _sunDate) return;
             _sun = sun;
             _sunOffset = null;
+        }
+
+        private async Task FetchWeatherAsync(DateTime utcNow)
+        {
+            _weatherBusy = true;
+            var weather = await WeatherApiService.GetAsync(Info.Latitude, Info.Longitude);
+            _weatherBusy = false;
+
+            if (weather is null)
+            {
+                _weatherNextAt = utcNow + TimeSpan.FromMinutes(10);
+                return;
+            }
+
+            _weatherNextAt = utcNow + TimeSpan.FromMinutes(30);
+            var degrees = (int)Math.Round(weather.Temperature, MidpointRounding.AwayFromZero);
+            TemperatureText = $"{degrees} °C";
+            WeatherText = WeatherCodes.Label(weather.Code);
+            WeatherGlyph = WeatherCodes.Glyph(weather.Code, weather.IsDay);
         }
 
         internal static string FormatOffset(TimeSpan t, string sep)

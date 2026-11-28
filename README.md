@@ -12,6 +12,7 @@ Application en **C#** (WPF, .NET 10) qui affiche l'heure de plusieurs villes du 
 
 - Horloge analogique et numérique pour la ville sélectionnée
 - Cartes par ville : heure, date, décalage (« Demain, +8 h »), icône jour/nuit calée sur le vrai soleil, heures de lever et de coucher du soleil récupérées via l'API [sunrise-sunset.org](https://sunrise-sunset.org/api)
+- Météo actuelle de chaque ville (température et ciel) via l'API [Open-Meteo](https://open-meteo.com), rafraîchie toutes les 30 min
 - Onglet **Carte** : carte du monde avec chaque ville placée à sa position, son heure, son écart et un point jour/nuit ; un clic sélectionne la ville
 - Ajout / suppression de villes, réorganisables par glisser-déposer (liste sauvegardée dans `%AppData%\ClockApp\villes.json`)
 - Heure récupérée via l'API [timeapi.io](https://timeapi.io), resynchronisée toutes les 15 min
@@ -39,5 +40,4 @@ Nécessite Windows et le SDK .NET 10.
 
 ## À faire
 
-- [ ] Météo de chaque ville sur les cartes
 - [ ] Setup d'installation
