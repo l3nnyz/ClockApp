@@ -192,7 +192,7 @@
             </StackPanel>
         </Grid>
 
-        <TabControl Grid.Row="1" Style="{StaticResource PivotTabControl}"
+        <TabControl x:Name="Tabs" Grid.Row="1" Style="{StaticResource PivotTabControl}"
                     ItemContainerStyle="{StaticResource PivotTab}">
         <TabItem Header="Horloge" Tag="&#xE917;">
         <Grid>

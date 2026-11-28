@@ -24,9 +24,10 @@ namespace ClockApp
                     ApplyTheme(settings.Theme);
             };
 
-            _tray = new TrayIcon(settings);
+            _tray = new TrayIcon(settings, _window.ViewModel);
             _tray.OpenRequested += () => _window.Open();
             _tray.ExitRequested += Quit;
+            _tray.TabRequested += i => _window.OpenTab(i);
             _window.HiddenToTray += _tray.ShowBackgroundHint;
             _window.ExitRequested += Quit;
 

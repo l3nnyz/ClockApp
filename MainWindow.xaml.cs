@@ -51,6 +51,12 @@ namespace ClockApp
             Activate();
         }
 
+        public void OpenTab(int index)
+        {
+            Tabs.SelectedIndex = index;
+            Open();
+        }
+
         public void StartBackgroundWork()
         {
             if (!_reminderTimer.IsEnabled) _reminderTimer.Start();

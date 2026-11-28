@@ -207,8 +207,11 @@ namespace ClockApp
 
             private void Refresh()
             {
-                Dot.Fill = City.IsDay ? DayBrush : NightBrush;
-                var size = City.IsSelected ? 14 : 10;
+                Dot.Fill = NightBrush;
+                if (City.IsDay) Dot.Fill = DayBrush;
+
+                var size = 10;
+                if (City.IsSelected) size = 14;
                 Dot.Width = size;
                 Dot.Height = size;
                 Canvas.SetLeft(Dot, Position.X - size / 2.0);

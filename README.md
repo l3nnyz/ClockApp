@@ -20,6 +20,7 @@ Application en **C#** (WPF, .NET 10) qui affiche l'heure de plusieurs villes du 
 - Alerte de changement d'heure : les cartes annoncent le passage à l'heure d'été ou d'hiver dans les 7 jours avec le nouvel écart, et une notification prévient deux jours avant
 - Thème au choix : système, clair ou sombre
 - Icône dans la zone de notification : fermer la fenêtre la range près de l'heure de Windows pour que les rappels continuent, avec une option pour lancer l'horloge au démarrage de Windows
+- Menu du clic droit sur l'icône (style Windows 11) : heure de vos villes, accès direct à l'horloge, à la carte et aux paramètres, synchronisation et réglages rapides des rappels
 
 ![Capture de l'onglet Carte](docs/screenshot-carte.png)
 
